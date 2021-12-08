@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { View, StyleSheet, FlatList, Image, Dimensions } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { AddToDo } from "../components/AddToDo";
 import { ToDo } from "../components/ToDo";
+import { AppButton } from "../components/ui/AppButton";
+import { AppLoader } from "../components/ui/AppLoader";
+import { AppText } from "../components/ui/AppText";
 import { ScreenContext } from "../context/screen/screenContext";
 import { TodoContext } from "../context/todo/todoContext";
 import { THEME } from "../Theme";
@@ -31,6 +35,21 @@ export const MainScreen = () => {
       Dimensions.removeEventListener("change", update);
     };
   }, []);
+
+  if (loading) {
+    return <AppLoader />;
+  }
+
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <AppText style={styles.error}>{error}</AppText>
+        <AppButton>
+          <Ionicons onPress={loadTodos} name="reload" size={24} color="fff" />
+        </AppButton>
+      </View>
+    );
+  }
 
   let content = (
     <View style={{ width: diviceWidth }}>
@@ -73,5 +92,14 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     resizeMode: "contain",
+  },
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  error: {
+    fontSize: 20,
+    color: THEME.DANGER_COLOR,
   },
 });

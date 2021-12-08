@@ -4,6 +4,7 @@ import { ScreenContext } from "../screen/screenContext";
 import {
   ADD_TODO,
   CLEAR_ERROR,
+  FETCH_TODOS,
   HIDE_LOADER,
   REMOVE_TODO,
   SHOW_ERROR,
@@ -57,14 +58,24 @@ export const TodoState = ({ children }) => {
   const updateTodo = (id, title) => dispatch({ type: UPDATE_TODO, id, title });
 
   const fetchTodos = async () => {
-    const response = await fetch(
-      "https://rn-todo-cfb1d-default-rtdb.europe-west1.firebasedatabase.app/todos.json",
-      {
-        headers: { "Content-Type": "aplication/json" },
-      }
-    );
-    const data = await response.json();
-    const todos = Object.keys(data).map((key) => ({ ...data[key], id: key }));
+    showLoader();
+    clearError();
+    try {
+      const response = await fetch(
+        "https://rn-todo-cfb1d-default-rtdb.europe-west1.firebasedatabase.app/todos.json",
+        {
+          headers: { "Content-Type": "aplication/json" },
+        }
+      );
+      const data = await response.json();
+      const todos = Object.keys(data).map((key) => ({ ...data[key], id: key }));
+      dispatch({ type: FETCH_TODOS, todos });
+    } catch (e) {
+      showError("Ups... smth wrong...");
+      console.log(e);
+    } finally {
+      hideLoader();
+    }
   };
 
   const showLoader = () => dispatch({ type: SHOW_LOADER });
